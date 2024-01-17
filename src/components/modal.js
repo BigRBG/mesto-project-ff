@@ -1,36 +1,41 @@
+import {
+    editPopup,
+    profileName,
+    profileProfession,
+    nameInput,
+    jobInput
+} from './constants.js'
 
-const editPopup = document.querySelector('.popup_type_edit');
-const profileName = document.querySelector('.profile__title')
-const profileProfession = document.querySelector('.profile__description')
-
-
-const formElEdit = document.forms['edit-profile']
-const nameInput = formElEdit.elements.name
-const jobInput = formElEdit.elements.description
+export { closePopup, openPopup, fillEditFormInputs, handleProfileFormSubmit }
 
 //Функция, удаляющая класс, ответственный за открытие попапа
 
-export function closePopup(popupElement) {
+function closePopup(popupElement) {
     popupElement.classList.remove('popup_is-opened')
     document.removeEventListener("keydown", closeModalButton)
+    popupElement.removeEventListener("mousedown", closePopupOutsideContent)
 }
+
 
 //Функция, добавляющая класс, ответственный за открытие попапа
 
-export function openPopup(popupElement) {
+function openPopup(popupElement) {
     popupElement.classList.add('popup_is-opened')
     document.addEventListener("keydown", closeModalButton)
-    popupElement.addEventListener("mousedown", function (e) {
-        if (!e.target.closest('.popup__content')) {
-            closePopup(e.target.closest('.popup'))
-        }
-    });
-    returnName()
+    popupElement.addEventListener("mousedown", closePopupOutsideContent)
 }
+
+// Функция закрытия попапа кликом, вне контента
+
+function closePopupOutsideContent(e) {
+    if (!e.target.closest('.popup__content')) {
+        closePopup(e.target.closest('.popup'))
+    }
+};
 
 // Объявили функцию - прямая трансляция,  данные в поля для ввода берутся из введенных ранее)
 
-export function returnName() {
+function fillEditFormInputs() {
     jobInput.value = profileProfession.textContent
     nameInput.value = profileName.textContent
 }
@@ -42,13 +47,13 @@ function closeModalButton(evt) {
     const ESC = "Escape"
     if (evt.key === ESC && popupIsOpen !== null) {
         popupIsOpen.classList.remove("popup_is-opened");
-        returnName()
+        fillEditFormInputs()
     }
 }
 
 // Функция сохранения данных, веденных в поля редактирования профиля
 
-export function handleFormSubmit(evt) {
+function handleProfileFormSubmit(evt) {
     evt.preventDefault()
 
     profileName.textContent = nameInput.value
