@@ -47,7 +47,6 @@ function closeModalButton(evt) {
     const ESC = "Escape"
     if (evt.key === ESC && popupIsOpen !== null) {
         popupIsOpen.classList.remove("popup_is-opened");
-        fillEditFormInputs()
     }
 }
 

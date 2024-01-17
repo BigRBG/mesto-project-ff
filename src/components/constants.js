@@ -1,7 +1,8 @@
 
-// Экспорт в Index JS
+
 
 export {
+// Экспорт в Index JS
     formElEdit,
     newPlace,
     inputNewCard,
@@ -12,7 +13,12 @@ export {
     closePopupProfileButton,
     closePopupButton,
     profileAddButton,
-    profileAdd
+    profileAdd,
+// Экспорт в modal JS
+    profileName,
+    profileProfession,
+    nameInput,
+    jobInput
 }
 
 const formElEdit = document.forms['edit-profile']
@@ -28,16 +34,6 @@ const closePopupProfileButton = editPopup.querySelector('.popup__close')
 const closePopupButton = document.querySelectorAll('.popup__close');
 const profileAddButton = document.querySelector('.profile__add-button');
 const profileAdd = document.querySelector('.popup_type_new-card');
-
-
-// Экспорт в modal JS
-
-export {
-    profileName,
-    profileProfession,
-    nameInput,
-    jobInput
-}
 
 const profileName = document.querySelector('.profile__title')
 const profileProfession = document.querySelector('.profile__description')
