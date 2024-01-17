@@ -52,13 +52,9 @@ closePopupProfileButton.addEventListener("click", fillEditFormInputs)
 
 function createNewCard(evt) {
     const plusCard = { name: inputNewCard.value, link: inputLinkCard.value }
-    const cardTemplate = document.querySelector('#card-template').content;
-    const cardElement = cardTemplate.querySelector('.card').cloneNode('true');
     const newCard = createCard(plusCard, deleteCard, likeButtonCard, openPopupCardImage)
 
     evt.preventDefault()
-
-    cardElement.insertBefore(newCard, cardElement.firstChild);
 
     closePopup(profileAdd)
     placesList.prepend(newCard);
