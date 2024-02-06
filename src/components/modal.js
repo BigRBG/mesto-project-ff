@@ -38,6 +38,7 @@ function closePopupOutsideContent(e) {
 function fillEditFormInputs() {
     jobInput.value = profileProfession.textContent
     nameInput.value = profileName.textContent
+    
 }
 
 // Функция, закрытия попапа кнопкой ESC
