@@ -11,6 +11,32 @@
   /*Макет очень кривоват, как считать этот отступ я хз. Проявите тут лояльность пока что*/
 }
 
+
+.profile__image-background {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: black;
+  opacity: 0;
+  inline-size: 100%;
+  block-size: 100%;
+  transition: opacity 0.3s ease-in-out; 
+}
+
+.profile__image:hover .profile__image-background {
+  opacity: 0.8;
+  cursor: default;
+  background-repeat: no-repeat;
+}
+
+.profile__image-edit {
+  width: 26px;
+  height: 26px;
+  fill: white;
+  cursor: pointer;
+}
+
+
 @media screen and (max-width: 740px) {
   .profile__image {
     margin: 0 10px 0 0;

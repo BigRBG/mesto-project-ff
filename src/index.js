@@ -1,162 +1,159 @@
-import './index.css';
-import { initialCards } from './components/cards.js';
-// import { enableValidation } from './components/validation.js'
-import { createCard, deleteCard, likeButtonCard, openPopupCardImage } from './components/card.js';
-import { handleProfileFormSubmit, closePopup, openPopup, fillEditFormInputs } from './components/modal.js';
+import './index.css'
 import {
+    getCards,
+    getInfoProfile,
+    outInfoProfile,
+    outCards,
+    updateAvatarProfile
+} from './components/api.js'
+
+import {
+    enableValidation,
+    validationConfig,
+    clearValidation
+} from './components/validation.js'
+
+import {
+    createCard,
+    deleteCard,
+    likeButtonCard,
+    openPopupCardImage
+} from './components/card.js'
+
+import {
+    closePopup,
+    openPopup,
+    fillEditFormInputs,
+    showSavingText,
+    hideSavingText
+} from './components/modal.js'
+
+import {
+    formEditAvatar,
     formElEdit,
     newPlace,
-    inputNewCard,
-    inputLinkCard,
     placesList,
     editPopup,
     editPopupButton,
     closePopupProfileButton,
     closePopupButton,
     profileAddButton,
-    profileAdd
+    profileAdd,
+    profileName,
+    profileProfession,
+    profileAvatar,
+    nameInput,
+    jobInput,
+    cardName,
+    cardURL,
+    popupTypeAvatar,
+    AvatarUrl
 } from './components/constants.js'
 
+let userId
+
+const promsInfoProAndCards = [getInfoProfile(), getCards()]
+
+Promise.all(promsInfoProAndCards)
+    .then(([profileData, cards]) => {                                              
+        profileName.textContent = profileData.name
+        profileProfession.textContent = profileData.about
+        profileAvatar.style.backgroundImage = `url(${profileData.avatar})`
+        userId = profileData._id
+
+        cards.forEach((card) => {
+            placesList.append(
+                createCard(card, deleteCard, likeButtonCard, openPopupCardImage, userId)
+            )
+        })
+    })
+    .catch(console.error)
+// Синхронизовали подгрузку карточек и информации о пользователе, прошлись по массиву из объектов, вытащили необходимые свойства и присоединили данные к DOM
 
 
-// @todo: Вывести карточки на страницу
+// Функция для отправки данных о профиле на сервер
+function patchDataServ() {
+        showSavingText()
+        return outInfoProfile(nameInput, jobInput)
+        .then((res) => {
+            profileName.textContent = res.name
+            profileProfession.textContent = res.about
+            closePopup(editPopup)
+            
+        })
+        .finally(() => {
+            hideSavingText()
+            })
+}
 
-initialCards.forEach(function (item) {
-    placesList.append(createCard(item, deleteCard, likeButtonCard, openPopupCardImage));
-});
 
-// Повесили прослушку на ссылку кнопки добавления карточек
+// Функция для отправки данных о карточке на сервер
+function addServCard() {
+        showSavingText()
+        return outCards(cardName, cardURL)
+        .then((card) => {
+                placesList.prepend(
+                    createCard(card, deleteCard, likeButtonCard, openPopupCardImage, userId)
+                )
+                closePopup(profileAdd)
+            })
+            .finally(() => {
+                hideSavingText()
+                })
+}
+
+// функция для отправки картинки профиля на сервер
+function handleEditAvatar() {
+        showSavingText()
+        return updateAvatarProfile(AvatarUrl.value).then((data) => {
+            profileAvatar.style = `background-image: url(${data.avatar})`
+            closePopup(popupTypeAvatar)
+            formEditAvatar.reset()
+        })
+        .finally(() => {
+            hideSavingText()
+            })
+}
+
+
+
 profileAddButton.addEventListener("click", () => {
     openPopup(profileAdd)
-
+    newPlace.reset()
+    clearValidation(newPlace, validationConfig)
 })
+// Повесили прослушку на ссылку кнопки добавления карточек
 
-// Повесили прослушку на ссылку кнопки редактирования карточки 
 editPopupButton.addEventListener("click", () => {
     fillEditFormInputs()
     openPopup(editPopup)
+    clearValidation(formElEdit, validationConfig)
 })
+// Повесили прослушку на ссылку кнопки редактирования профиля 
 
-// Повесели прослушку на ссылку каждого элемента псевдомассива из кнопок для закрытия(крестики)
 closePopupButton.forEach((el) => {
     el.addEventListener("click", () => {
         closePopup((el.closest('.popup')))
     })
 })
+// Повесели прослушку на ссылку каждого элемента псевдомассива из кнопок для закрытия(крестики)
 
-
-// Повесели прослушку на ссылку к форме 
-formElEdit.addEventListener("submit", handleProfileFormSubmit)
-
-// Добавили прослушку, на кнопку закрытие попапа "Редактирование профиля"
 closePopupProfileButton.addEventListener("click", fillEditFormInputs)
+// Повесели прослушку, на кнопку закрытие попапа "Редактирование профиля"
 
-// Объявили функцию, которая собирает добвленную карточку
+profileAvatar.addEventListener("click", () => {
+    formEditAvatar.reset()
+    openPopup(popupTypeAvatar)
+    clearValidation(popupTypeAvatar, validationConfig)
+})
+// Повесели прослушку, на клик по изображению аватара.
 
-function createNewCard(evt) {
-    const plusCard = { name: inputNewCard.value, link: inputLinkCard.value }
-    const newCard = createCard(plusCard, deleteCard, likeButtonCard, openPopupCardImage)
-
-    evt.preventDefault()
-
-    closePopup(profileAdd)
-    placesList.prepend(newCard);
-    newPlace.reset()
-}
-
-
-// Повесели прослушку на ссылку к модальному окну, попапа добавления карточек
-newPlace.addEventListener("submit", createNewCard)
+newPlace.addEventListener("submit", addServCard)
+formEditAvatar.addEventListener("submit", handleEditAvatar)
+formElEdit.addEventListener("submit", patchDataServ)
 
 
+enableValidation(validationConfig)
 
-const validationConfig = {
-    formSelector: '.popup__form',
-    inputSelector: '.popup__input',
-    submitButtonSelector: '.popup__button',
-    inactiveButtonClass: 'popup__button_disabled',
-    inputErrorClass: 'popup__input_type_error',
-    errorClass: 'popup__error_visible'
-}
-
-
-function showInputError(validationConfig, formSelector, inputSelector, errorMessage) {
-    const errorElement = formSelector.querySelector(`.${inputSelector.id}-error`)
-    inputSelector.classList.add(validationConfig.inputErrorClass)
-    errorElement.classList.add(validationConfig.errorClass)
-    errorElement.textContent = errorMessage;
-}
-
-
-function hideInputError(validationConfig, formSelector, inputSelector){
-
-    const errorElement = formSelector.querySelector(`.${inputSelector.id}-error`)
-    inputSelector.classList.remove(validationConfig.inputErrorClass)
-    errorElement.classList.remove(validationConfig.errorClass)
-    errorElement.textContent = "";
-
-}
-
-function checkInputValidity(formSelector, inputSelector){
-    if (inputSelector.validity.patternMismatch) {
-    inputSelector.setCustomValidity(inputSelector.dataset.errorMessage);
-  } else {
-    inputSelector.setCustomValidity("");
-  }
-    if (!inputSelector.validity.valid){
-        showInputError(validationConfig, formSelector, inputSelector, inputSelector.validationMessage)
-    }else{
-        hideInputError(validationConfig, formSelector, inputSelector)
-    }
-}
-
-
-function hasInvalidInput (inputSelectorList) {
-    return inputSelectorList.some((inputSelector) => {
-      return !inputSelector.validity.valid
-    })
-  }
-  
-
-
-
-function toggleButtonState (validationConfig, inputSelectorList, submitButtonSelector) {
-    if (hasInvalidInput(inputSelectorList)){
-      submitButtonSelector.classList.add(validationConfig.inactiveButtonClass)
-      submitButtonSelector.disabled = true
-    } else {
-      submitButtonSelector.disabled = false
-      submitButtonSelector.classList.remove(validationConfig.inactiveButtonClass)
-    }
-  }
-
-
-function setEventListeners(validationConfig, formSelector){
-    const inputSelectorList = Array.from(formSelector.querySelectorAll(validationConfig.inputSelector))
-    const submitButtonSelector = formSelector.querySelector(validationConfig.submitButtonSelector)
-    toggleButtonState (validationConfig, inputSelectorList, submitButtonSelector)
-    
-    inputSelectorList.forEach((inputSelector) => {
-        inputSelector.addEventListener('input', () => {
-            checkInputValidity(formSelector, inputSelector)
-            toggleButtonState (validationConfig, inputSelectorList, submitButtonSelector)
-        })
-    })
-}
-
-function enableValidation(validationConfig){
-    const formSelectorList = Array.from(document.querySelectorAll(validationConfig.formSelector))
-    
-    formSelectorList.forEach((formSelector) => {
-
-        formSelector.addEventListener('submit', (e) => {
-            e.preventDefault();
-        });
-       setEventListeners(validationConfig, formSelector);
-    })
-}
-
-
-enableValidation(validationConfig); 
 
 

@@ -1,12 +1,29 @@
 import {
-    editPopup,
     profileName,
     profileProfession,
     nameInput,
     jobInput
 } from './constants.js'
 
-export { closePopup, openPopup, fillEditFormInputs, handleProfileFormSubmit }
+export { closePopup, openPopup, fillEditFormInputs, showSavingText, hideSavingText }
+
+
+
+
+function showSavingText() {
+    const buttonSaveId = Array.from(document.querySelectorAll('.button__save'))
+    buttonSaveId.forEach((button) => {
+        button.textContent = 'Сохранение...'
+    })
+}
+
+function hideSavingText() {
+    const buttonSaveId = Array.from(document.querySelectorAll('.button__save'))
+    buttonSaveId.forEach((button) => {
+        button.textContent = 'Сохранить'
+    })
+}
+
 
 //Функция, удаляющая класс, ответственный за открытие попапа
 
@@ -14,6 +31,7 @@ function closePopup(popupElement) {
     popupElement.classList.remove('popup_is-opened')
     document.removeEventListener("keydown", closeModalButton)
     popupElement.removeEventListener("mousedown", closePopupOutsideContent)
+
 }
 
 
@@ -38,7 +56,7 @@ function closePopupOutsideContent(e) {
 function fillEditFormInputs() {
     jobInput.value = profileProfession.textContent
     nameInput.value = profileName.textContent
-    
+
 }
 
 // Функция, закрытия попапа кнопкой ESC
@@ -51,12 +69,3 @@ function closeModalButton(evt) {
     }
 }
 
-// Функция сохранения данных, веденных в поля редактирования профиля
-
-function handleProfileFormSubmit(evt) {
-    evt.preventDefault()
-
-    profileName.textContent = nameInput.value
-    profileProfession.textContent = jobInput.value
-    closePopup(editPopup)
-}
