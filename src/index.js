@@ -13,12 +13,7 @@ import {
   clearValidation,
 } from "./components/validation.js";
 
-import {
-  createCard,
-  deleteCard,
-  likeButtonCard,
-  openPopupCardImage,
-} from "./components/card.js";
+import { createCard, deleteCard, likeButtonCard } from "./components/card.js";
 
 import { closePopup, openPopup } from "./components/modal.js";
 
@@ -41,11 +36,21 @@ import {
   cardURL,
   popupTypeAvatar,
   avatarUrl,
+  popupImage,
+  popupCaption,
+  popupTypeImage,
 } from "./components/constants.js";
 
 let userId;
 
 const promsInfoProAndCards = [getInfoProfile(), getCards()];
+
+function openPopupCardImage(card) {
+  popupImage.alt = card.name;
+  popupCaption.textContent = card.name;
+  popupImage.src = card.link;
+  openPopup(popupTypeImage);
+}
 
 // Синхронизовали подгрузку карточек и информации о пользователе, прошлись по массиву из объектов, вытащили необходимые свойства и присоединили данные к DOM
 Promise.all(promsInfoProAndCards)
@@ -70,7 +75,6 @@ Promise.all(promsInfoProAndCards)
   .catch(console.error);
 
 // Объявили функцию - прямая трансляция,  данные в поля для ввода берутся из введенных ранее)
-
 function fillEditFormInputs() {
   jobInput.value = profileProfession.textContent;
   nameInput.value = profileName.textContent;
@@ -88,14 +92,14 @@ function hideSavingText(button) {
 function handleProfileFormSubmit(evt) {
   evt.preventDefault();
   showSavingText(evt.target.querySelector(".popup__button"));
-  return setProfileInfo(nameInput.value, jobInput.value)
+  setProfileInfo(nameInput.value, jobInput.value)
     .then((res) => {
       profileName.textContent = res.name;
       profileProfession.textContent = res.about;
+      closePopup(editPopup);
     })
     .catch(console.error)
     .finally(() => {
-      closePopup(editPopup);
       hideSavingText(evt.target.querySelector(".popup__button"));
     });
 }
@@ -104,7 +108,7 @@ function handleProfileFormSubmit(evt) {
 function handleCardFormSubmit(evt) {
   evt.preventDefault();
   showSavingText(evt.target.querySelector(".popup__button"));
-  return postCard(cardName.value, cardURL.value)
+  postCard(cardName.value, cardURL.value)
     .then((card) => {
       cardsContainer.prepend(
         createCard(
@@ -115,13 +119,13 @@ function handleCardFormSubmit(evt) {
           userId,
         ),
       );
+      formNewPlace.reset();
+      clearValidation(formNewPlace, validationConfig);
+      closePopup(profileAdd);
     })
     .catch(console.error)
     .finally(() => {
-      closePopup(profileAdd);
       hideSavingText(evt.target.querySelector(".popup__button"));
-      clearValidation(formNewPlace, validationConfig);
-      formNewPlace.reset();
     });
 }
 
@@ -129,16 +133,16 @@ function handleCardFormSubmit(evt) {
 function handleEditAvatar(evt) {
   evt.preventDefault();
   showSavingText(evt.target.querySelector(".popup__button"));
-  return updateAvatarProfile(avatarUrl.value)
+  updateAvatarProfile(avatarUrl.value)
     .then((data) => {
       profileAvatar.style.backgroundImage = `url(${data.avatar})`;
+      closePopup(popupTypeAvatar);
+      clearValidation(popupTypeAvatar, validationConfig);
+      formEditAvatar.reset();
     })
     .catch(console.error)
     .finally(() => {
-      closePopup(popupTypeAvatar);
       hideSavingText(evt.target.querySelector(".popup__button"));
-      clearValidation(popupTypeAvatar, validationConfig);
-      formEditAvatar.reset();
     });
 }
 
@@ -149,9 +153,16 @@ profileAddButton.addEventListener("click", () => {
 
 // Повесили прослушку на ссылку кнопки редактирования профиля
 editPopupButton.addEventListener("click", () => {
-  fillEditFormInputs();
-  openPopup(editPopup);
   clearValidation(formElEdit, validationConfig);
+  formElEdit.reset();
+  fillEditFormInputs();
+
+  openPopup(editPopup);
+});
+
+// Повесели прослушку, на клик по изображению аватара.
+profileAvatar.addEventListener("click", () => {
+  openPopup(popupTypeAvatar);
 });
 
 // Повесели прослушку на ссылку каждого элемента псевдомассива из кнопок для закрытия(крестики)
@@ -160,11 +171,6 @@ buttonClosePopupList.forEach((el) => {
   el.addEventListener("click", () => {
     closePopup(popup);
   });
-});
-
-// Повесели прослушку, на клик по изображению аватара.
-profileAvatar.addEventListener("click", () => {
-  openPopup(popupTypeAvatar);
 });
 
 formNewPlace.addEventListener("submit", handleCardFormSubmit);

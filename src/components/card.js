@@ -1,12 +1,7 @@
-import { openPopup } from "./modal.js";
 import { removeLike, deleteCardData, setLike } from "./api.js";
-export { createCard, deleteCard, likeButtonCard, openPopupCardImage };
 
 // @todo: Функция создания карточки
 const cardTemplate = document.querySelector("#card-template").content;
-const popupImage = document.querySelector(".popup__image");
-const popupTypeImage = document.querySelector(".popup_type_image");
-const popupCaption = document.querySelector(".popup__caption");
 
 function createCard(
   card,
@@ -54,13 +49,6 @@ function createCard(
 
 // Функция открытия попапа изображения карточки
 
-function openPopupCardImage(card) {
-  popupImage.alt = card.name;
-  popupCaption.textContent = card.name;
-  popupImage.src = card.link;
-  openPopup(popupTypeImage);
-}
-
 // Функция для функционирования сердца у карточек.
 
 function likeButtonCard(cardId, likeButton, likeCounter) {
@@ -81,3 +69,5 @@ function deleteCard(cardId, cardElement) {
     .then(() => cardElement.remove())
     .catch(console.error);
 }
+
+export { createCard, deleteCard, likeButtonCard };

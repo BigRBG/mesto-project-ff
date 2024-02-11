@@ -1,5 +1,3 @@
-export { closePopup, openPopup };
-
 //Функция, удаляющая класс, ответственный за открытие попапа
 
 function closePopup(popupElement) {
@@ -33,3 +31,5 @@ function handleCloseModalByEsc(evt) {
     closePopup(popupIsOpen);
   }
 }
+
+export { closePopup, openPopup };

@@ -20,6 +20,9 @@ export {
   cardURL,
   popupTypeAvatar,
   avatarUrl,
+  popupImage,
+  popupCaption,
+  popupTypeImage,
 };
 
 const formElEdit = document.forms["edit-profile"];
@@ -30,6 +33,9 @@ const formEditAvatar = document.forms["avatar"];
 
 const cardsContainer = document.querySelector(".places__list");
 
+const popupTypeImage = document.querySelector(".popup_type_image");
+const popupImage = document.querySelector(".popup__image");
+const popupCaption = document.querySelector(".popup__caption");
 const popupTypeAvatar = document.querySelector(".popup_type_avatar");
 const editPopup = document.querySelector(".popup_type_edit");
 const editPopupButton = document.querySelector(".profile__edit-button");

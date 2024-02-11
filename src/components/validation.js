@@ -1,5 +1,3 @@
-export { enableValidation, clearValidation, validationConfig };
-
 const validationConfig = {
   formSelector: ".popup__form",
   inputSelector: ".popup__input",
@@ -11,99 +9,95 @@ const validationConfig = {
 
 function showInputError(
   validationConfig,
-  formSelector,
-  inputSelector,
+  formElement,
+  inputElement,
   errorMessage,
 ) {
-  const errorElement = formSelector.querySelector(`.${inputSelector.id}-error`);
-  inputSelector.classList.add(validationConfig.inputErrorClass);
+  const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
+  inputElement.classList.add(validationConfig.inputErrorClass);
   errorElement.classList.add(validationConfig.errorClass);
   errorElement.textContent = errorMessage;
 }
 
-function hideInputError(validationConfig, formSelector, inputSelector) {
-  const errorElement = formSelector.querySelector(`.${inputSelector.id}-error`);
-  inputSelector.classList.remove(validationConfig.inputErrorClass);
+function hideInputError(validationConfig, formElement, inputElement) {
+  const errorElement = formElement.querySelector(`.${inputElement.id}-error`);
+  inputElement.classList.remove(validationConfig.inputErrorClass);
   errorElement.classList.remove(validationConfig.errorClass);
   errorElement.textContent = "";
 }
 
 // Функция проверки валидности полей
-function checkInputValidity(validationConfig, formSelector, inputSelector) {
-  if (inputSelector.validity.patternMismatch) {
+function checkInputValidity(validationConfig, formElement, inputElement) {
+  if (inputElement.validity.patternMismatch) {
     // Валидное регулярное значение даст - False
-    inputSelector.setCustomValidity(inputSelector.dataset.errorMessage); // Что приведет использованию методом setCustomValidity, специального кастомного сообщения
+    inputElement.setCustomValidity(inputElement.dataset.errorMessage); // Что приведет использованию методом setCustomValidity, специального кастомного сообщения
   } else {
     // Иначе True и результатом уже будет пустая строка, то есть, либо ошибки не будет, либо некастамизированная
-    inputSelector.setCustomValidity("");
+    inputElement.setCustomValidity("");
   }
-  if (!inputSelector.validity.valid) {
+  if (!inputElement.validity.valid) {
     // Поле не(!) соотвуетствует по всем параметрам валидности, то использовать функуцию раскрытия ошибки
     showInputError(
       validationConfig,
-      formSelector,
-      inputSelector,
-      inputSelector.validationMessage,
+      formElement,
+      inputElement,
+      inputElement.validationMessage,
     );
   } else {
     // В случае соответсвтия поля и валидности, скрыть ошибку.
-    hideInputError(validationConfig, formSelector, inputSelector);
+    hideInputError(validationConfig, formElement, inputElement);
   }
 }
 
-function hasInvalidInput(inputSelectorList) {
-  return inputSelectorList.some((inputSelector) => {
-    return !inputSelector.validity.valid;
+function hasInvalidInput(inputList) {
+  return inputList.some((inputElement) => {
+    return !inputElement.validity.valid;
   });
 }
 
-function toggleButtonState(
-  validationConfig,
-  inputSelectorList,
-  submitButtonSelector,
-) {
-  if (hasInvalidInput(inputSelectorList)) {
-    submitButtonSelector.classList.add(validationConfig.inactiveButtonClass);
-    submitButtonSelector.disabled = true;
+function disableButton(validationConfig, buttonElement) {
+  buttonElement.classList.add(validationConfig.inactiveButtonClass);
+  buttonElement.disabled = true;
+}
+
+function toggleButtonState(validationConfig, inputList, buttonElement) {
+  if (hasInvalidInput(inputList)) {
+    disableButton(validationConfig, buttonElement);
   } else {
-    submitButtonSelector.disabled = false;
-    submitButtonSelector.classList.remove(validationConfig.inactiveButtonClass);
+    buttonElement.disabled = false;
+    buttonElement.classList.remove(validationConfig.inactiveButtonClass);
   }
 }
 
-function clearValidation(formSelector, validationConfig) {
+function clearValidation(formElement, validationConfig) {
   const inputList = Array.from(
-    formSelector.querySelectorAll(validationConfig.inputSelector),
+    formElement.querySelectorAll(validationConfig.inputSelector),
   );
-  const submitButtonSelector = formSelector.querySelector(
+  const buttonElement = formElement.querySelector(
     validationConfig.submitButtonSelector,
   );
 
   inputList.forEach((elErrorSpan) => {
-    hideInputError(validationConfig, formSelector, elErrorSpan);
     elErrorSpan.setCustomValidity("");
+    hideInputError(validationConfig, formElement, elErrorSpan);
   });
 
-  toggleButtonState(validationConfig, inputList, submitButtonSelector);
+  disableButton(validationConfig, buttonElement);
 }
 
-function setEventListeners(validationConfig, formSelector) {
-  const inputSelectorList = Array.from(
-    formSelector.querySelectorAll(validationConfig.inputSelector),
+function setEventListeners(validationConfig, formElement) {
+  const inputList = Array.from(
+    formElement.querySelectorAll(validationConfig.inputSelector),
   );
-  const submitButtonSelector = formSelector.querySelector(
+  const buttonElement = formElement.querySelector(
     validationConfig.submitButtonSelector,
   );
-  toggleButtonState(validationConfig, inputSelectorList, submitButtonSelector);
+  toggleButtonState(validationConfig, inputList, buttonElement);
 
-  inputSelectorList.forEach((inputSelector) => {
-    inputSelector.addEventListener("input", () => {
-      checkInputValidity(validationConfig, formSelector, inputSelector);
-      toggleButtonState(
-        validationConfig,
-        inputSelectorList,
-        submitButtonSelector,
-      );
+  inputList.forEach((inputElement) => {
+    inputElement.addEventListener("input", () => {
+      checkInputValidity(validationConfig, formElement, inputElement);
+      toggleButtonState(validationConfig, inputList, buttonElement);
     });
   });
 }
@@ -117,3 +111,5 @@ function enableValidation(validationConfig) {
     setEventListeners(validationConfig, formElement);
   });
 }
+
+export { enableValidation, clearValidation, validationConfig };
