@@ -1,111 +1,88 @@
-export {  
-  getCards, 
-  getInfoProfile,
-  outInfoProfile,
-  outCards,
-  incCounter,
-  decCounter,
-  deleteCardData,
-  updateAvatarProfile 
-}
-
-
-
 const config = {
-  baseUrl: 'https://mesto.nomoreparties.co/v1/wff-cohort-4',
+  baseUrl: "https://mesto.nomoreparties.co/v1/wff-cohort-4",
   headers: {
-    authorization: '84dae7a7-74d4-489a-a691-80cf4928969a',
-    'Content-Type': 'application/json'
-  }
-}
+    authorization: "84dae7a7-74d4-489a-a691-80cf4928969a",
+    "Content-Type": "application/json",
+  },
+};
 
-function legoPromise(URL, settings) {
-  return fetch(URL, settings)
-    .then(res => {
-      if (res.ok) {
-        return res.json();
-      }
-      return Promise.reject(`Ошибка: ${res.status}`);
-    });
-
-}
 // Для удобства сложили повторяющийся код в функцию
-
-function getCards() {
-  return legoPromise(`${config.baseUrl}/cards`, {
-    method: 'GET',
-    headers: config.headers
-  })
+function request(URL, settings) {
+  return fetch(URL, settings).then((res) => {
+    if (res.ok) {
+      return res.json();
+    }
+    return Promise.reject(`Ошибка: ${res.status}`);
+  });
 }
+
 // Зафетчмакали данные карточек от серевера
-
-
-function getInfoProfile() {
-  return legoPromise(`${config.baseUrl}/users/me`, {
-    method: 'GET',
-    headers: config.headers
-  })
+function getCards() {
+  return request(`${config.baseUrl}/cards`, {
+    method: "GET",
+    headers: config.headers,
+  });
 }
+
 // Зафетчмакали данные профиля от серевера
+function getInfoProfile() {
+  return request(`${config.baseUrl}/users/me`, {
+    method: "GET",
+    headers: config.headers,
+  });
+}
 
-
-
-function outInfoProfile(name, description) {
-  return legoPromise(`${config.baseUrl}/users/me`, {
-    method: 'PATCH',
+// Зафетчмакали данные профиля на сервер
+function setProfileInfo(name, about) {
+  return request(`${config.baseUrl}/users/me`, {
+    method: "PATCH",
     headers: config.headers,
     body: JSON.stringify({
-      name: name.value,
-      about: description.value
+      name,
+      about,
     }),
   });
 }
-// Зафетчмакали данные профиля на сервер
 
-function outCards(name, link) {
-  return legoPromise(`${config.baseUrl}/cards`, {
+// Зафетчмакали данные карточек на сервер
+function postCard(name, link) {
+  return request(`${config.baseUrl}/cards`, {
     method: "POST",
     headers: config.headers,
     body: JSON.stringify({
-      name: name.value,
-      link: link.value
+      name,
+      link,
     }),
-
   });
 }
-// Зафетчмакали данные карточек на сервер
 
-
-
-function incCounter(cardId) {
-  return legoPromise(`${config.baseUrl}/cards/likes/${cardId}`, {
+// Лайк Серверу
+function setLike(cardId) {
+  return request(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: "PUT",
     headers: config.headers,
   });
 }
 
-// Лайк Серверу
-
-function decCounter(cardId) {
-  return legoPromise(`${config.baseUrl}/cards/likes/${cardId}`, {
-    method: "DELETE",
-    headers: config.headers,
-  });
-}
-
 // Дизлайк Серверу
-
-function deleteCardData(cardId) {
-  return legoPromise(`${config.baseUrl}/cards/${cardId}`, {
+function removeLike(cardId) {
+  return request(`${config.baseUrl}/cards/likes/${cardId}`, {
     method: "DELETE",
     headers: config.headers,
   });
 }
 
 // Карточка удаляется по ID
+function deleteCardData(cardId) {
+  return request(`${config.baseUrl}/cards/${cardId}`, {
+    method: "DELETE",
+    headers: config.headers,
+  });
+}
 
+// Отправляем на сервер ссылку на новую аватарку для профиля
 function updateAvatarProfile(avatar) {
-  return legoPromise(`${config.baseUrl}/users/me/avatar`, {
+  return request(`${config.baseUrl}/users/me/avatar`, {
     method: "PATCH",
     headers: config.headers,
     body: JSON.stringify({
@@ -113,4 +90,14 @@ function updateAvatarProfile(avatar) {
     }),
   });
 }
-// Отправляем на сервер ссылку на новую аватарку для профиля
+
+export {
+  getCards,
+  getInfoProfile,
+  setProfileInfo,
+  postCard,
+  setLike,
+  removeLike,
+  deleteCardData,
+  updateAvatarProfile,
+};
